@@ -10,9 +10,9 @@ __pycache__/
 *.pyc
 .pytest_cache/
 
-data/raw/
 *.parquet
 *.sqlite
+*.csv
 
 _freeze/
 _site/
