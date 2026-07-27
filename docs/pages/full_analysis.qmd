@@ -8,7 +8,7 @@ execute:
 ```{python}
 import sys
 if 'google.colab' in sys.modules:
-    !git clone [https://github.com/crabguy/clash-royale-matchmaking-analysis.git](https://github.com/crabguy/clash-royale-matchmaking-analysis.git)
+    !git clone [https://github.com/CrabGuy/ClashRoyaleMatchmakingAnalysis.git](https://github.com/CrabGuy/ClashRoyaleMatchmakingAnalysis.git)
     %cd clash-royale-matchmaking
     !pip install -r requirements.txt
 ```
