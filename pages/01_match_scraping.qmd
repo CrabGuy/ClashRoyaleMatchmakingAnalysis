@@ -74,7 +74,7 @@ We specify the initial player to start our web from, how many unique battles we 
 
 ```{python}
 START_PLAYER_TAG = "%23PU2JQCUJQ"
-AMOUNT_OF_BATTLES = 1_000
+AMOUNT_OF_BATTLES = 10_000
 WORKERS = 5
 
 ```
