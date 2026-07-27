@@ -1,5 +1,5 @@
 ---
-title: "Main explanation"
+title: "Summary"
 format:
   html: default
   ipynb: default

@@ -14,6 +14,8 @@ if 'google.colab' in sys.modules:
     !pip install -r requirements.txt
 ```
 
+{{< include ../.env.example >}}
+
 {{< include 01_match_scraping.qmd >}}
 
 {{< include 02_matchmaking_analysis.qmd >}}

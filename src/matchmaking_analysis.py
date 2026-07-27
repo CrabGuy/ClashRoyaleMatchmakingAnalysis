@@ -1,10 +1,12 @@
+# BEGIN IMPORT_LIBRARIES
 from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
+# END IMPORT_LIBRARIES
 
-
+# BEGIN LOAD_MATCHES
 def load_matches(file_name, hf_repo=None):
-    local_path = Path("data/processed") / file_name
+    local_path = Path("../data/processed") / file_name
     if local_path.exists():
         return pd.read_parquet(local_path)
     if hf_repo:
@@ -12,8 +14,9 @@ def load_matches(file_name, hf_repo=None):
     raise FileNotFoundError(
         f"Could not find {local_path} and no hf_repo provided."
     )
+# END IMPORT_LIBRARIES
 
-
+# BEGIN ASSIGN_STRATA
 def assign_strata(df, trophy_bin_size=500):
     trophy_bracket = (
         df["match_average_trophies"] // trophy_bin_size * trophy_bin_size
@@ -24,8 +27,9 @@ def assign_strata(df, trophy_bin_size=500):
         .astype(str)
     )
     return df.assign(stratum=trophy_bracket.astype(str) + "_" + time_bucket)
+# END ASSIGN_STRATA
 
-
+# BEGIN GET_EXPLODED_PAIRS
 def get_exploded_pairs(df):
     df = df.assign(
         p1=df["player1_deck"].str.split("|"), p2=df["player2_deck"].str.split("|")
@@ -36,8 +40,9 @@ def get_exploded_pairs(df):
     p2_exp["match_id"] = p2_exp.index
 
     return pd.merge(p1_exp, p2_exp, on="match_id")
+# END GET_EXPLODED_PAIRS
 
-
+# BEGIN COMPUTE_DEVIATIONS
 def compute_deviations(merged_pairs, min_matches=200):
     crosstab = pd.crosstab(
         [merged_pairs["stratum"], merged_pairs["p1"]], merged_pairs["p2"]
@@ -60,8 +65,9 @@ def compute_deviations(merged_pairs, min_matches=200):
     weighted_dev = abs_deviations * weights
 
     return weighted_dev.groupby(level=1).sum() / weights.groupby(level=1).sum()
+# END COMPUTE_DEVIATIONS
 
-
+# BEGIN PLOT_ALL_DEVIATIONS
 def plot_all_deviations(agg_dev):
     plot_data = agg_dev.sort_values(ascending=False)
 
@@ -78,8 +84,9 @@ def plot_all_deviations(agg_dev):
 
     plt.tight_layout()
     plt.show()
+# END PLOT_ALL_DEVIATIONS
 
-
+# BEGIN MAIN
 def main():
     THRESHOLD_PERCENTAGE = 1.5
     FILE_NAME = "trophy_battles.parquet"
@@ -114,3 +121,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+# END MAIN

@@ -1,3 +1,4 @@
+# BEGIN IMPORT_LIBRARIES
 import csv
 import hashlib
 import os
@@ -5,26 +6,34 @@ import random
 from concurrent.futures import ThreadPoolExecutor
 from itertools import islice
 from pathlib import Path
+
 import pyarrow as pa
 import pyarrow.csv as pv
 import pyarrow.parquet as pq
-from pybloom_live import ScalableBloomFilter
 import requests
 from dotenv import load_dotenv
+from pybloom_live import ScalableBloomFilter
 
-SCRIPT_DIR = Path(__file__).resolve().parent
-PARENT_DIR = SCRIPT_DIR.parent
+# END IMPORT_LIBRARIES
 
-dotenv_path = PARENT_DIR / ".env"
-load_dotenv(dotenv_path=dotenv_path)
+# BEGIN CONFIG
+import os
+from pathlib import Path
 
-API_KEY = os.getenv("API_KEY")
+PARENT_DIR = Path.cwd().parent
+DATA_DIR = PARENT_DIR / "data"
+CSV_FILENAME = DATA_DIR / "raw" / "trophy_battles.csv"
+PARQUET_FILENAME = DATA_DIR / "processed" / "trophy_battles.parquet"
+
+CSV_FILENAME.parent.mkdir(parents=True, exist_ok=True)
+PARQUET_FILENAME.parent.mkdir(parents=True, exist_ok=True)
+
+load_dotenv()
+API_KEY = API_KEY # type: ignore
 if not API_KEY:
-    raise ValueError(f"API_KEY not found in environment or file: {dotenv_path}")
+    raise ValueError("API_KEY not found")
 
 DATA_DIR = PARENT_DIR / "data"
-DATA_DIR.mkdir(parents=True, exist_ok=True)
-
 CSV_FILENAME = DATA_DIR / "raw" / "trophy_battles.csv"
 PARQUET_FILENAME = DATA_DIR / "processed" / "trophy_battles.parquet"
 
@@ -34,8 +43,10 @@ WORKERS = 5
 
 HEADERS = {"Authorization": f"Bearer {API_KEY}"}
 
+# END CONFIG
 
-def fetch_battlelog(player_tag):
+# BEGIN FETCH_BATTLE_LOG
+def fetch_battle_log(player_tag):
     tag = player_tag if player_tag.startswith("%23") else f"%23{player_tag.lstrip('#')}"
     try:
         res = requests.get(
@@ -52,7 +63,9 @@ def fetch_battlelog(player_tag):
         print(f"Request exception for {tag}: {e}", flush=True)
         return []
 
+# END FETCH_BATTLE_LOG
 
+# BEGIN EXTRACT_BATTLE_DATA
 def extract_battle_data(battle):
     if battle.get("type") != "PvP":
         return None
@@ -60,6 +73,7 @@ def extract_battle_data(battle):
     team = battle.get("team", [{}])[0]
     opponent = battle.get("opponent", [{}])[0]
     p1_tag, p2_tag = team.get("tag", ""), opponent.get("tag", "")
+
     if not p1_tag or not p2_tag:
         return None
 
@@ -80,7 +94,9 @@ def extract_battle_data(battle):
         "opponent_tag": p2_tag,
     }
 
+# END EXTRACT_BATTLE_DATA
 
+# BEGIN FILTER_UNSEEN
 def filter_unseen(battles, bloom):
     def is_unseen(b):
         if b["battle_id"] in bloom:
@@ -90,7 +106,9 @@ def filter_unseen(battles, bloom):
 
     return list(filter(is_unseen, battles))
 
+# END FILTER_UNSEEN
 
+# BEGIN NEXT_TAGS
 def next_tags(opponents, pool, count=WORKERS):
     def pick():
         if opponents and random.random() > 0.10:
@@ -99,7 +117,9 @@ def next_tags(opponents, pool, count=WORKERS):
 
     return [pick() for _ in range(count)]
 
+# END NEXT_TAGS
 
+# BEGIN BATTLE_STREAM
 def battle_stream(start_tag):
     bloom = ScalableBloomFilter(initial_capacity=1000, error_rate=0.001)
     pool = [start_tag]
@@ -107,7 +127,7 @@ def battle_stream(start_tag):
 
     with ThreadPoolExecutor(max_workers=WORKERS) as executor:
         while True:
-            results = executor.map(fetch_battlelog, current_tags)
+            results = executor.map(fetch_battle_log, current_tags)
             all_battles = [b for log in results for b in log]
             extracted = list(filter(None, map(extract_battle_data, all_battles)))
             new_battles = filter_unseen(extracted, bloom)
@@ -120,19 +140,25 @@ def battle_stream(start_tag):
 
             current_tags = next_tags(opponents, pool)
 
+# END BATTLE_STREAM
 
+# BEGIN CONVERT_CSV_TO_PARQUET
 def convert_csv_to_parquet(csv_file, parquet_file):
     reader = pv.open_csv(str(csv_file))
     writer = None
+
     for batch in reader:
         table = pa.Table.from_batches([batch])
         if writer is None:
             writer = pq.ParquetWriter(str(parquet_file), table.schema)
         writer.write_table(table)
+
     if writer:
         writer.close()
 
+# END CONVERT_CSV_TO_PARQUET
 
+# BEGIN SAVE_BATTLES
 def save_battles(start_tag, target_count):
     with open(CSV_FILENAME, mode="w", newline="", encoding="utf-8") as file:
         writer = csv.writer(file)
@@ -149,11 +175,17 @@ def save_battles(start_tag, target_count):
         list(map(write_and_log, enumerate(islice(battle_stream(start_tag), target_count), 1)))
 
     convert_csv_to_parquet(CSV_FILENAME, PARQUET_FILENAME)
-
     csv_mb = os.path.getsize(CSV_FILENAME) / (1024 * 1024)
     parquet_mb = os.path.getsize(PARQUET_FILENAME) / (1024 * 1024)
     print(f"CSV Size: {csv_mb:.2f} MB | Parquet Size: {parquet_mb:.2f} MB", flush=True)
 
+# END SAVE_BATTLES
+
+# BEGIN MAIN
+def main():
+    save_battles(START_PLAYER_TAG, AMOUNT_OF_BATTLES)
+
 
 if __name__ == "__main__":
-    save_battles(START_PLAYER_TAG, AMOUNT_OF_BATTLES)
+    main()
+# END MAIN

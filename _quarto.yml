@@ -10,7 +10,7 @@ website:
     background: primary
     left:
       - href: pages/index.qmd
-        text: Main explanation
+        text: Summary
         icon: house
       - href: pages/01_match_scraping.qmd
         text: "Match scaping"
@@ -20,7 +20,7 @@ website:
         icon: bar-chart-line
     right:
       - icon: github
-        href: https://github.com/
+        href: https://github.com/CrabGuy/ClashRoyaleMatchmakingAnalysis
 
 format:
   html:

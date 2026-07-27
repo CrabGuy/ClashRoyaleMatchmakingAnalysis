@@ -110,11 +110,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <header id="quarto-header" class="headroom fixed-top">
     <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="../index.html">
-    <span class="navbar-title">Clash Royale Matchmaking Analysis</span>
-    </a>
-  </div>
             <div id="quarto-search" class="" title="Search"></div>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
@@ -122,16 +117,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../index.qmd"> 
-<span class="menu-text">Executive Summary</span></a>
+    <a class="nav-link" href="../pages/index.html"> <i class="bi bi-house" role="img">
+</i> 
+<span class="menu-text">Main explanation</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../01_match_scraping.qmd"> 
-<span class="menu-text">Part 1: Data Collection</span></a>
+    <a class="nav-link" href="../pages/01_match_scraping.html"> <i class="bi bi-database" role="img">
+</i> 
+<span class="menu-text">Match scaping</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../02_matchmaking_analysis.qmd"> 
-<span class="menu-text">Part 2: Matchmaking Analysis</span></a>
+    <a class="nav-link" href="../pages/02_matchmaking_analysis.html"> <i class="bi bi-bar-chart-line" role="img">
+</i> 
+<span class="menu-text">Matchmaking analysis</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
   </li>  
 </ul>
           </div> <!-- /navcollapse -->
@@ -150,8 +155,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#setup-environment" id="toc-setup-environment" class="nav-link active" data-scroll-target="#setup-environment">Setup Environment</a></li>
+  <li><a href="#the-project-uses-royale-api-proxy-service-huge-shoutout-to-them" id="toc-the-project-uses-royale-api-proxy-service-huge-shoutout-to-them" class="nav-link" data-scroll-target="#the-project-uses-royale-api-proxy-service-huge-shoutout-to-them">The project uses royale api proxy service, huge shoutout to them</a></li>
+  <li><a href="#follow-this-guide-to-create-your-own-to-put-here" id="toc-follow-this-guide-to-create-your-own-to-put-here" class="nav-link" data-scroll-target="#follow-this-guide-to-create-your-own-to-put-here">Follow this guide to create your own to put here</a></li>
+  <li><a href="#httpsdocs.royaleapi.comproxy.html" id="toc-httpsdocs.royaleapi.comproxy.html" class="nav-link" data-scroll-target="#httpsdocs.royaleapi.comproxy.html">https://docs.royaleapi.com/proxy.html</a></li>
   </ul>
-<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="full_analysis.ipynb" download="full_analysis.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
+</nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
@@ -177,7 +185,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="setup-environment" class="level1">
 <h1>Setup Environment</h1>
-<div id="406011c5" class="cell" data-execution_count="1">
+<div id="57cf4ecc" class="cell" data-execution_count="1">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
@@ -187,6 +195,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">!</span>pip install <span class="op">-</span>r requirements.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
+</section>
+<section id="the-project-uses-royale-api-proxy-service-huge-shoutout-to-them" class="level1">
+<h1>The project uses royale api proxy service, huge shoutout to them</h1>
+</section>
+<section id="follow-this-guide-to-create-your-own-to-put-here" class="level1">
+<h1>Follow this guide to create your own to put here</h1>
+</section>
+<section id="httpsdocs.royaleapi.comproxy.html" class="level1">
+<h1>https://docs.royaleapi.com/proxy.html</h1>
+<p>API_KEY=“YOUR_OWN_API_KEY_HERE”</p>
 <p>This is the explanation on how the match scraping works</p>
 <p>This is the explanation of how the statistical analysis works</p>
 
