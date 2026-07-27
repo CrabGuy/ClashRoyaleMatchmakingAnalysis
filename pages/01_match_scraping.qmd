@@ -1,8 +1,289 @@
 ---
 title: "Match Scraping"
 format:
-  html: default
+  html:
+    code-fold: false
   ipynb: default
+execute:
+  eval: false
 ---
 
-This is the explanation on how the match scraping works
+In this section, I’ll cover how I fetched and cleaned match data from the Clash Royale API.
+
+## How the Scraper Works (The "Spider" Approach)
+
+To build a dataset, I used a **spider scraper**.
+
+1. Start with **Player A** and fetch their recent matches (~25 battles).
+2. Randomly pick one of their opponents (**Player B**).
+3. Fetch **Player B's** matches, pick one of *their* opponents (**Player C**), and repeat.
+
+By constantly jumping from opponent to opponent, the script creates a continuous chain of real battle data.
+
+## Step-by-Step Implementation
+
+### Setup and Environment
+First, we import our tools and set up file paths to save the scraped data.
+
+```{python}
+#| code-fold: true
+#| code-summary: "Show imports and declarations"
+import csv
+import hashlib
+import os
+import random
+from concurrent.futures import ThreadPoolExecutor
+from itertools import islice
+from pathlib import Path
+
+import pyarrow as pa
+import pyarrow.csv as pv
+import pyarrow.parquet as pq
+import requests
+from dotenv import load_dotenv
+from pybloom_live import ScalableBloomFilter
+
+import os
+from pathlib import Path
+
+PARENT_DIR = Path.cwd().parent
+DATA_DIR = PARENT_DIR / "data"
+CSV_FILENAME = DATA_DIR / "raw" / "trophy_battles.csv"
+PARQUET_FILENAME = DATA_DIR / "processed" / "trophy_battles.parquet"
+
+CSV_FILENAME.parent.mkdir(parents=True, exist_ok=True)
+PARQUET_FILENAME.parent.mkdir(parents=True, exist_ok=True)
+
+load_dotenv()
+API_KEY = API_KEY # type: ignore
+if not API_KEY:
+    raise ValueError("API_KEY not found")
+
+DATA_DIR = PARENT_DIR / "data"
+CSV_FILENAME = DATA_DIR / "raw" / "trophy_battles.csv"
+PARQUET_FILENAME = DATA_DIR / "processed" / "trophy_battles.parquet"
+
+HEADERS = {"Authorization": f"Bearer {API_KEY}"}
+```
+
+---
+
+### Configurations
+
+We specify the initial player to start our web from, how many unique battles we want to collect, and how many requests to run at the same time (workers).
+
+```{python}
+START_PLAYER_TAG = "%23PU2JQCUJQ"
+AMOUNT_OF_BATTLES = 1_000
+WORKERS = 5
+
+```
+
+---
+
+### Fetching Data from the API
+
+This function sends a request to the official Clash Royale API proxy to retrieve a player's recent battle history.
+```{python}
+def fetch_battle_log(player_tag):
+    tag = player_tag if player_tag.startswith("%23") else f"%23{player_tag.lstrip('#')}"
+    try:
+        res = requests.get(
+            f"https://proxy.royaleapi.dev/v1/players/{tag}/battlelog",
+            headers=HEADERS,
+            timeout=10,
+        )
+        if res.status_code == 200:
+            return res.json()
+        else:
+            print(f"API Error [{res.status_code}] for tag {tag}: {res.text}", flush=True)
+            return []
+    except requests.exceptions.RequestException as e:
+        print(f"Request exception for {tag}: {e}", flush=True)
+        return []
+
+```
+
+---
+
+### Cleaning & Extracting Features
+
+Raw API responses contain a lot of extra information we don't need. Here, we extract only 1v1 trophy matches and convert them into clean records containing:
+
+* A **unique Battle ID** (created by hashing the timestamp and player tags to ensure no duplicate matches are saved).
+* The **average trophy count** of the players.
+* The **cards used in both decks**.
+
+```{python}
+def extract_battle_data(battle):
+    if battle.get("type") != "PvP":
+        return None
+
+    team = battle.get("team", [{}])[0]
+    opponent = battle.get("opponent", [{}])[0]
+    p1_tag, p2_tag = team.get("tag", ""), opponent.get("tag", "")
+
+    if not p1_tag or not p2_tag:
+        return None
+
+    timestamp = battle.get("battleTime", "")
+    raw_id = f"{timestamp}_{'_'.join(sorted([p1_tag, p2_tag]))}"
+    battle_id = hashlib.sha256(raw_id.encode("utf-8")).hexdigest()
+
+    p1_deck = "|".join(c["name"] for c in team.get("cards", []))
+    p2_deck = "|".join(c["name"] for c in opponent.get("cards", []))
+
+    p1_trophies = team.get("startingTrophies", 0) or 0
+    p2_trophies = opponent.get("startingTrophies", 0) or 0
+    avg_trophies = (p1_trophies + p2_trophies) / 2
+
+    return {
+        "battle_id": battle_id,
+        "record": [battle_id, timestamp, avg_trophies, p1_deck, p2_deck],
+        "opponent_tag": p2_tag,
+    }
+
+```
+
+---
+
+### Avoiding Duplicate Matches (Bloom Filter)
+
+Because players encounter each other often, our scraper will naturally run into matches it has already seen. Normally, you might check a giant list of saved IDs, but as the dataset grows into millions of matches, that list takes up a lot of RAM.
+
+Instead, I use a **Bloom Filter**; a smart memory-saving structure. It tells us if a match is *definitely new* or *likely a duplicate*, using a low amount of memory.
+
+```{python}
+def filter_unseen(battles, bloom):
+    def is_unseen(b):
+        if b["battle_id"] in bloom:
+            return False
+        bloom.add(b["battle_id"])
+        return True
+
+    return list(filter(is_unseen, battles))
+
+```
+
+---
+
+### Picking the Next Player ("Random Walk with Teleportation")
+
+If our scraper only moves forward from opponent to opponent, it risks getting stuck in a small loop of active players.
+
+To prevent this, the script uses a **Random Walk with Teleportation**:
+
+* **90% of the time:** It picks a random opponent from the current match (moving forward).
+* **10% of the time ("Teleportation"):** It jumps back to a previously seen player from a global pool.
+
+This small chance to "teleport" breaks potential loops and ensures the scraper explores different parts of the player base.
+
+```{python}
+def next_tags(opponents, pool, count=WORKERS):
+    def pick():
+        if opponents and random.random() > 0.10:
+            return random.choice(opponents)
+        return random.choice(pool) if pool else START_PLAYER_TAG
+
+    return [pick() for _ in range(count)]
+
+```
+
+---
+
+### Combining Everything: The Data Stream
+
+This function connects all the pieces: it fetches data concurrently, cleans it, deduplicates it using the Bloom Filter, and streams out new battles one by one.
+
+```{python}
+def battle_stream(start_tag):
+    bloom = ScalableBloomFilter(initial_capacity=1000, error_rate=0.001)
+    pool = [start_tag]
+    current_tags = [start_tag]
+
+    with ThreadPoolExecutor(max_workers=WORKERS) as executor:
+        while True:
+            results = executor.map(fetch_battle_log, current_tags)
+            all_battles = [b for log in results for b in log]
+            extracted = list(filter(None, map(extract_battle_data, all_battles)))
+            new_battles = filter_unseen(extracted, bloom)
+
+            yield from new_battles
+
+            opponents = [b["opponent_tag"] for b in new_battles]
+            if opponents:
+                pool[:] = pool[-100:] + opponents
+
+            current_tags = next_tags(opponents, pool)
+
+```
+
+---
+
+### Saving and Storage Optimization
+
+We save the data into two different file formats:
+
+1. **CSV:** Plain text format, easy to open and check manually.
+2. **Parquet:** A compressed, fast format optimized for large-scale data analysis.
+
+```{python}
+def convert_csv_to_parquet(csv_file, parquet_file):
+    reader = pv.open_csv(str(csv_file))
+    writer = None
+
+    for batch in reader:
+        table = pa.Table.from_batches([batch])
+        if writer is None:
+            writer = pq.ParquetWriter(str(parquet_file), table.schema)
+        writer.write_table(table)
+
+    if writer:
+        writer.close()
+
+def save_battles(start_tag, target_count):
+    with open(CSV_FILENAME, mode="w", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+        writer.writerow(
+            ["battle_id", "timestamp", "match_average_trophies", "player1_deck", "player2_deck"]
+        )
+
+        def write_and_log(item):
+            count, battle = item
+            writer.writerow(battle["record"])
+            if count == 1 or count % 100 == 0:
+                print(f"[{count}/{target_count}] Saved battle ID: {battle['record'][0]}", flush=True)
+
+        list(map(write_and_log, enumerate(islice(battle_stream(start_tag), target_count), 1)))
+
+    convert_csv_to_parquet(CSV_FILENAME, PARQUET_FILENAME)
+    csv_mb = os.path.getsize(CSV_FILENAME) / (1024 * 1024)
+    parquet_mb = os.path.getsize(PARQUET_FILENAME) / (1024 * 1024)
+    print(f"CSV Size: {csv_mb:.2f} MB | Parquet Size: {parquet_mb:.2f} MB", flush=True)
+
+```
+
+---
+
+### Execution
+
+Finally, we launch the scraper with our starting player tag and target match count.
+
+```{python}
+def main():
+    save_battles(START_PLAYER_TAG, AMOUNT_OF_BATTLES)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+---
+
+## Design Choices: Why Scale & Memory Matter
+
+When scraping large amounts of data from an API, the main challenge isn't speed, it's **memory management**.
+
+1. **Streaming Data directly to storage:** Instead of keeping millions of matches in memory before saving, the script processes and writes matches on the go.
+2. **Memory-efficient Deduplication:** A standard list or Python `set()` of 1 million IDs eats way more RAM. A Bloom Filter uses a tiny fraction of that memory by allowing a negligible trade-off: a tiny percentage of *false positives* (where a brand-new match might accidentally get tossed out as a duplicate). For a huge dataset, losing <0.1% of matches is well worth the better scaling.
+3. **Graph Traversal Strategy:** Scraping player networks is essentially traversing a massive graph. While standard computer science algorithms (like *Breadth-First Search*, or a lossy version) work well, a **Random Walk with Teleportation** is simpler to implement, lightweight on memory and can be explained more easily to people without a computer science background.

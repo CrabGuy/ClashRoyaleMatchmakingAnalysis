@@ -1,5 +1,5 @@
 ---
-title: "Clash Royale Matchmaking — Complete Analysis"
+title: "Clash Royale Matchmaking - Complete Analysis"
 format:
   html: default
   ipynb: default

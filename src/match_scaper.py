@@ -1,4 +1,4 @@
-# BEGIN IMPORT_LIBRARIES
+# start snippet IMPORT_LIBRARIES
 import csv
 import hashlib
 import os
@@ -14,7 +14,7 @@ import requests
 from dotenv import load_dotenv
 from pybloom_live import ScalableBloomFilter
 
-# END IMPORT_LIBRARIES
+# end snippet IMPORT_LIBRARIES
 
 # BEGIN CONFIG
 import os
@@ -181,7 +181,6 @@ def save_battles(start_tag, target_count):
 
 # END SAVE_BATTLES
 
-# BEGIN MAIN
 def main():
     save_battles(START_PLAYER_TAG, AMOUNT_OF_BATTLES)
 

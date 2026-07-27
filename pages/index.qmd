@@ -1,5 +1,5 @@
 ---
-title: "Summary"
+title: "Executive Summary"
 format:
   html: default
   ipynb: default
@@ -41,7 +41,7 @@ Feel free to correct me!
 The whole code is open source and the analysis is easily replicable.
 You can open this analysis on Google Colab and run it yourself by pressing the button down below.
 
-[![](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/your-username/clash-royale-matchmaking/blob/main/pages/full_analysis.ipynb)
+[![](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/crabguy/clash-royale-matchmaking-analysis/blob/main/notebooks/full_analysis.ipynb)
 
 ## References
 

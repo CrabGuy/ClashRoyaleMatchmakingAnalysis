@@ -17,6 +17,7 @@ data/raw/
 _freeze/
 _site/
 .quarto/
+_extensions/
 
 .DS_Store
 .vscode/

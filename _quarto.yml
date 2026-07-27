@@ -10,7 +10,7 @@ website:
     background: primary
     left:
       - href: pages/index.qmd
-        text: Summary
+        text: Executive summary
         icon: house
       - href: pages/01_match_scraping.qmd
         text: "Match scaping"
