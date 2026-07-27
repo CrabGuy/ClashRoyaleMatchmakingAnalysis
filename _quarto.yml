@@ -15,7 +15,7 @@ website:
         text: Executive summary
         icon: house
       - href: pages/01_match_scraping.qmd
-        text: "Match scaping"
+        text: "Match scraping"
         icon: database
       - href: pages/02_matchmaking_analysis.qmd
         text: "Matchmaking analysis"
