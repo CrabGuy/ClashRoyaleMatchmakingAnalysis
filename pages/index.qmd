@@ -1,0 +1,51 @@
+---
+title: "Main explanation"
+format:
+  html: default
+  ipynb: default
+---
+
+
+## Is Clash Royale's Matchmaking Rigged?
+
+The short answer: **No**. The data shows no evidence that the matchmaking system deliberately pairs you with decks that counter yours under any circumstance.
+
+## How I Checked
+
+I analyzed **1 million real matches** from the Clash Royale API to see if opponents' cards were influenced by your deck.
+
+Here's what I did:
+
+1. **Scraped the data** - I pulled 1 million match records from the official Clash Royale API
+2. **Compared distributions** - I looked at how often each card appeared against you vs. how often it appears overall
+3. **Measured the difference** - I used statistical testing to see if there was a meaningful gap
+
+[Learn more about how I scraped the data →](./01_match_scraping.html)
+
+## What I Found
+
+**Mean Absolute Deviation: 0.0989%**
+
+This number tells me how much the cards you faced deviated from what you'd expect by random chance. At just 0.01%, it's extremely small, basically noise. 
+
+In practical terms: if a card appears in 5% of all matches, you'll face it roughly 5% of the time, regardless of your deck.
+
+**There's no hidden algorithm adjusting opponents to hard-counter you**.
+
+[See my full statistical analysis →](./02_matchmaking_analysis.html)
+
+## Do you think I made a mistake?
+
+Feel free to correct me!
+
+The whole code is open source and the analysis is easily replicable.
+You can open this analysis on Google Colab and run it yourself by pressing the button down below.
+
+[![](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/your-username/clash-royale-matchmaking/blob/main/pages/full_analysis.ipynb)
+
+## References
+
+This project uses several tools and libraries.
+You can find all of the tools used for the project and the inspiration for this analysis here.
+
+[View references page →](./references.html)

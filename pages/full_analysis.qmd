@@ -1,0 +1,19 @@
+---
+title: "Clash Royale Matchmaking — Complete Analysis"
+format:
+  html: default
+  ipynb: default
+---
+
+# Setup Environment
+```{python}
+import sys
+if 'google.colab' in sys.modules:
+    !git clone [https://github.com/your-username/clash-royale-matchmaking.git](https://github.com/your-username/clash-royale-matchmaking.git)
+    %cd clash-royale-matchmaking
+    !pip install -r requirements.txt
+```
+
+{{< include 01_match_scraping.qmd >}}
+
+{{< include 02_matchmaking_analysis.qmd >}}

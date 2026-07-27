@@ -1,0 +1,8 @@
+---
+title: "References"
+format:
+  html: default
+  ipynb: default
+---
+
+This is the references part

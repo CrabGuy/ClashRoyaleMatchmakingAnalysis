@@ -1,0 +1,34 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "Clash Royale Matchmaking Analysis"
+  search: true
+  navbar:
+    title: false
+    background: primary
+    left:
+      - href: pages/index.qmd
+        text: Main explanation
+        icon: house
+      - href: pages/01_match_scraping.qmd
+        text: "Match scaping"
+        icon: database
+      - href: pages/02_matchmaking_analysis.qmd
+        text: "Matchmaking analysis"
+        icon: bar-chart-line
+    right:
+      - icon: github
+        href: https://github.com/
+
+format:
+  html:
+    theme: flatly
+    toc: true
+    code-fold: show
+    format-links: false
+  ipynb: default
+
+execute:
+  freeze: auto
