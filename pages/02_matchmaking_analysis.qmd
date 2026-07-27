@@ -46,6 +46,7 @@ def load_matches(file_name, hf_repo=None):
         return pd.read_parquet(local_path)
     if hf_repo:
         print("Loading dataset from Hugging Face...")
+        print("This might take a while")
         return pd.read_parquet(f"hf://datasets/{hf_repo}/{file_name}")
     raise FileNotFoundError(
         f"Could not find {local_path} and no hf_repo provided."

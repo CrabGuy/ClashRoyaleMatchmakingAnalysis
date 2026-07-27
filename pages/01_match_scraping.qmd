@@ -58,6 +58,8 @@ load_dotenv()
 API_KEY = API_KEY # type: ignore
 if not API_KEY:
     raise ValueError("API_KEY not found")
+if API_KEY == "YOUR_OWN_API_KEY_HERE":
+    raise RuntimeError("You need to create your own API key")
 
 DATA_DIR = PARENT_DIR / "data"
 CSV_FILENAME = DATA_DIR / "raw" / "trophy_battles.csv"
@@ -74,7 +76,7 @@ We specify the initial player to start our web from, how many unique battles we 
 
 ```{python}
 START_PLAYER_TAG = "%23PU2JQCUJQ"
-AMOUNT_OF_BATTLES = 10_000
+AMOUNT_OF_BATTLES = 5_000
 WORKERS = 5
 
 ```
