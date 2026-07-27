@@ -9,7 +9,7 @@ execute:
 import sys
 if 'google.colab' in sys.modules:
     !git clone [https://github.com/CrabGuy/ClashRoyaleMatchmakingAnalysis.git](https://github.com/CrabGuy/ClashRoyaleMatchmakingAnalysis.git)
-    %cd clash-royale-matchmaking
+    %cd ClashRoyaleMatchmakingAnalysis
     !pip install -r requirements.txt
 ```
 

@@ -212,17 +212,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="setup-environment" class="level1">
 <h1>Setup Environment</h1>
-<div id="12700d18" class="cell" data-execution_count="1">
+<div id="faa06c9b" class="cell" data-execution_count="1">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="st">'google.colab'</span> <span class="kw">in</span> sys.modules:</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">!</span>git clone [https:<span class="op">//</span>github.com<span class="op">/</span>CrabGuy<span class="op">/</span>ClashRoyaleMatchmakingAnalysis.git](https:<span class="op">//</span>github.com<span class="op">/</span>CrabGuy<span class="op">/</span>ClashRoyaleMatchmakingAnalysis.git)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">%</span>cd clash<span class="op">-</span>royale<span class="op">-</span>matchmaking</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    <span class="op">%</span>cd ClashRoyaleMatchmakingAnalysis</span>
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="op">!</span>pip install <span class="op">-</span>r requirements.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
-<div id="9aa8a04d" class="cell" data-execution_count="2">
+<div id="1bb905d6" class="cell" data-execution_count="2">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># To generate an api key follow the RoyaleAPI tutorial here</span></span>
@@ -247,7 +247,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="setup-and-environment" class="level3">
 <h3 class="anchored" data-anchor-id="setup-and-environment">Setup and Environment</h3>
 <p>First, we import our tools and set up file paths to save the scraped data.</p>
-<div id="66c3f302" class="cell" data-execution_count="3">
+<div id="7481962b" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Show imports and declarations</summary>
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> csv</span>
@@ -293,7 +293,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="configurations" class="level3">
 <h3 class="anchored" data-anchor-id="configurations">Configurations</h3>
 <p>We specify the initial player to start our web from, how many unique battles we want to collect, and how many requests to run at the same time (workers).</p>
-<div id="e50bbadb" class="cell" data-execution_count="4">
+<div id="078eddf2" class="cell" data-execution_count="4">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>START_PLAYER_TAG <span class="op">=</span> <span class="st">"%23PU2JQCUJQ"</span></span>
@@ -306,7 +306,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="fetching-data-from-the-api" class="level3">
 <h3 class="anchored" data-anchor-id="fetching-data-from-the-api">Fetching Data from the API</h3>
 <p>This function sends a request to the official Clash Royale API proxy to retrieve a player’s recent battle history.</p>
-<div id="aab729ef" class="cell" data-execution_count="5">
+<div id="a22b448b" class="cell" data-execution_count="5">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> fetch_battle_log(player_tag):</span>
@@ -337,7 +337,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>The <strong>average trophy count</strong> of the players.</li>
 <li>The <strong>cards used in both decks</strong>.</li>
 </ul>
-<div id="2572b21b" class="cell" data-execution_count="6">
+<div id="615f5c6a" class="cell" data-execution_count="6">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> extract_battle_data(battle):</span>
@@ -375,7 +375,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="avoiding-duplicate-matches-bloom-filter">Avoiding Duplicate Matches (Bloom Filter)</h3>
 <p>Because players encounter each other often, our scraper will naturally run into matches it has already seen. Normally, you might check a giant list of saved IDs, but as the dataset grows into millions of matches, that list takes up a lot of RAM.</p>
 <p>Instead, I use a <strong>Bloom Filter</strong>; a smart memory-saving structure. It tells us if a match is <em>definitely new</em> or <em>likely a duplicate</em>, using a low amount of memory.</p>
-<div id="fc2f7268" class="cell" data-execution_count="7">
+<div id="e6d2f4cc" class="cell" data-execution_count="7">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> filter_unseen(battles, bloom):</span>
@@ -399,7 +399,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>10% of the time (“Teleportation”):</strong> It jumps back to a previously seen player from a global pool.</li>
 </ul>
 <p>This small chance to “teleport” breaks potential loops and ensures the scraper explores different parts of the player base.</p>
-<div id="35d6b9b4" class="cell" data-execution_count="8">
+<div id="a1907bbe" class="cell" data-execution_count="8">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> next_tags(opponents, pool, count<span class="op">=</span>WORKERS):</span>
@@ -416,7 +416,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="combining-everything-the-data-stream" class="level3">
 <h3 class="anchored" data-anchor-id="combining-everything-the-data-stream">Combining Everything: The Data Stream</h3>
 <p>This function connects all the pieces: it fetches data concurrently, cleans it, deduplicates it using the Bloom Filter, and streams out new battles one by one.</p>
-<div id="2b502626" class="cell" data-execution_count="9">
+<div id="4342acb8" class="cell" data-execution_count="9">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> battle_stream(start_tag):</span>
@@ -449,7 +449,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>CSV:</strong> Plain text format, easy to open and check manually.</li>
 <li><strong>Parquet:</strong> A compressed, fast format optimized for large-scale data analysis.</li>
 </ol>
-<div id="ca29083b" class="cell" data-execution_count="10">
+<div id="006f1d2d" class="cell" data-execution_count="10">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> convert_csv_to_parquet(csv_file, parquet_file):</span>
@@ -491,7 +491,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="execution" class="level3">
 <h3 class="anchored" data-anchor-id="execution">Execution</h3>
 <p>Finally, we launch the scraper with our starting player tag and target match count.</p>
-<div id="fc84a87e" class="cell" data-execution_count="11">
+<div id="ebc4531a" class="cell" data-execution_count="11">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> main():</span>
@@ -536,7 +536,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="data-loading">1. Data Loading</h3>
 <p>First, we load our processed Parquet file locally. If it was not generated by the scraping code before, the function automatically falls back to fetching the big dataset directly from Hugging Face.</p>
 <p>Set <code>USE_COMPLETE_DATASET</code> to <code>True</code> to use the 1 million matches dataset.</p>
-<div id="ea61c594" class="cell" data-execution_count="12">
+<div id="74d6bad6" class="cell" data-execution_count="12">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>USE_COMPLETE_DATASET <span class="op">=</span> <span class="va">False</span></span>
@@ -564,7 +564,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 class="anchored" data-anchor-id="grouping-matches-into-strata-trophy-time-buckets">2. Grouping Matches into “Strata” (Trophy &amp; Time Buckets)</h3>
 <p>Card popularity changes depending on your trophy count (e.g., lower arenas play different cards than top ladder) and over time (e.g., balance updates).</p>
 <p>If we don’t control for this, a natural shift in card popularity could look like a rigged algorithm. This function divides matches into <strong>strata</strong>-buckets based on 500-trophy ranges and specific weeks-so we only compare players against others in the exact same environment.</p>
-<div id="1d3f997b" class="cell" data-execution_count="13">
+<div id="d06a317a" class="cell" data-execution_count="13">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> assign_strata(df, trophy_bin_size<span class="op">=</span><span class="dv">500</span>):</span>
@@ -584,7 +584,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="unpacking-decks-into-card-pairs" class="level3">
 <h3 class="anchored" data-anchor-id="unpacking-decks-into-card-pairs">3. Unpacking Decks into Card Pairs</h3>
 <p>Each match consists of 8 cards on Player 1’s side and 8 cards on Player 2’s side (64 individual card pairings per match). This function “explodes” the deck strings into individual card matchups so we can analyze how often Card A faces Card B.</p>
-<div id="2ffa1d7e" class="cell" data-execution_count="14">
+<div id="65d8ee5c" class="cell" data-execution_count="14">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_exploded_pairs(df):</span>
@@ -610,7 +610,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>We calculate the difference (<strong>Mean Absolute Deviation</strong>).</li>
 </ol>
 <p>If the algorithm is random, the deviation between what you face and the baseline should be tiny (close to 0%).</p>
-<div id="3cee56f9" class="cell" data-execution_count="15">
+<div id="5b02037b" class="cell" data-execution_count="15">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> compute_deviations(merged_pairs, min_matches<span class="op">=</span><span class="dv">200</span>):</span>
@@ -642,7 +642,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="visualizing-the-results" class="level3">
 <h3 class="anchored" data-anchor-id="visualizing-the-results">5. Visualizing the Results</h3>
 <p>This function plots a bar chart showing the average deviation score for every card in the game.</p>
-<div id="3b850b26" class="cell" data-execution_count="16">
+<div id="6815c32a" class="cell" data-execution_count="16">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> plot_all_deviations(agg_dev):</span>
@@ -668,7 +668,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="main-execution-loop" class="level3">
 <h3 class="anchored" data-anchor-id="main-execution-loop">6. Main Execution Loop</h3>
 <p>We put everything together. We establish a strict threshold (1.5% maximum allowed deviation to account for natural random variance). If the overall mean deviation stays below this threshold, we conclude matchmaking is fair and random, if its not, its <strong>rigged</strong>!!</p>
-<div id="405eba2d" class="cell" data-execution_count="17">
+<div id="c86e957e" class="cell" data-execution_count="17">
 <details open="" class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> main():</span>
